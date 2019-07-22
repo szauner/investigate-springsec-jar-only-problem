@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configuration>
+
+<!-- 
+Important note for JUL (java.util.logging) based libraries:
+Spring can not propagate Log4j log levels into JUL, see
+https://github.com/spring-projects/spring-boot/issues/2923
+Therefore the library 'org.apache.logging.log4j:log4j-jul' has to be included via dependency management
+and the system property 'java.util.logging.manager' has to be set accordingly:
+-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+Otherwise JUL based loggers will not be affected by the configuration in this file!
+The property seems to be set accordingly as of Spring Boot 2.0.0. 
+Problem is also discussed here:
+https://github.com/spring-projects/spring-boot/issues/2585
+-->
+
+<!-- The attribute 'status' configures the StatusLogger which records logging system events. -->
+<Configuration status="WARN">
+  <Appenders>
+    <RollingRandomAccessFile name="File" fileName="/opt/services/logs/service.log"
+                             filePattern="logs/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log.gz">
+      <PatternLayout pattern="%-5level %d{MMM dd, yyyy HH:mm:ss.SSS} [%t] %X %logger{36}:%L - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+    </RollingRandomAccessFile>
+    <RollingRandomAccessFile name="JerseyFile" fileName="/opt/services/logs/service-jersey.log"
+                             filePattern="logs/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}-%i.log.gz">
+      <PatternLayout pattern="%-5level %d{MMM dd, yyyy HH:mm:ss.SSS} [%t] %X %logger{36}:%L - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1"/>
+        <SizeBasedTriggeringPolicy size="250 MB"/>
+      </Policies>
+    </RollingRandomAccessFile>
+  </Appenders>
+  <Loggers>
+    <Root level="warn">
+      <AppenderRef ref="File"/>
+    </Root>
+    <logger name="com.company" level="info" additivity="false">
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="JerseyRequestLogger" level="info" additivity="false">
+      <AppenderRef ref="JerseyFile"/>
+    </logger>
+  </Loggers>
+</Configuration>

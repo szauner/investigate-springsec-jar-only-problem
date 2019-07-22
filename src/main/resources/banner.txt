@@ -1,0 +1,2 @@
+ :: Example Service ::
+powered by Spring Boot ${spring-boot.formatted-version}

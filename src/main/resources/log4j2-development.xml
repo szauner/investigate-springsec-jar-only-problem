@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configuration>
+
+<!-- 
+Important note for JUL (java.util.logging) based libraries:
+Spring can not propagate Log4j log levels into JUL, see
+https://github.com/spring-projects/spring-boot/issues/2923
+Therefore the library 'org.apache.logging.log4j:log4j-jul' has to be included via dependency management
+and the system property 'java.util.logging.manager' has to be set accordingly:
+-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+Otherwise JUL based loggers will not be affected by the configuration in this file!
+Problem is also discussed here:
+https://github.com/spring-projects/spring-boot/issues/2585
+-->
+
+<!-- The attribute 'status' configures the StatusLogger which records logging system events. -->
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-5level %d{MMM dd, yyyy HH:mm:ss.SSS} [%t] %X %logger{36}.%M:%L%n  %msg%n"/>
+    </Console>
+    <File name="File" fileName="logs/application.log">
+      <PatternLayout pattern="%-5level %d{MMM dd, yyyy HH:mm:ss.SSS} [%t] %X %logger{36}:%L - %msg%n"/>
+    </File>
+    <File name="JerseyFile" fileName="logs/jersey.log">
+      <PatternLayout pattern="%-5level %d{MMM dd, yyyy HH:mm:ss.SSS} [%t] %X %logger{36}:%L - %msg%n"/>
+    </File>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </Root>
+    <logger name="com.company" level="debug" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="org.apache.tomcat" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="org.apache.catalina" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="org.springframework" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="org.springframework.security" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="org.hibernate" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="org.glassfish.jersey" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="File"/>
+    </logger>
+    <logger name="JerseyRequestLogger" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="JerseyFile"/>
+    </logger>
+  </Loggers>
+</Configuration>

@@ -1,0 +1,124 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.5.RELEASE'
+    }
+
+    repositories {
+        jcenter()
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://repo.spring.io/milestone" }
+    }
+    
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+
+//Java version
+sourceCompatibility = 1.8
+targetCompatibility = 1.8 
+
+
+defaultTasks "bootRun"
+
+
+/* Configuration of the application package */
+
+jar {
+    baseName = "service"
+    version =  "1.0.0"
+}
+
+bootJar {
+    manifest {
+        attributes("Manifest-Version": "1.0",
+	        "Specification-Title": "Company Service",
+			"Specification-Version": "1.0",
+			"Specification-Vendor": "Company",
+			"Implementation-Title": "com.company.service",
+			"Implementation-Version": "1.0.0",
+			"Implementation-Vendor": "Company")
+    }
+}
+
+// In this section is declared where to find the dependencies of the project
+repositories {
+    // Using jcenter for resolving dependencies
+    jcenter()
+
+    // Alternatively use maven central
+    mavenCentral()
+    
+    // Repository for Spring libraries
+    maven { url "https://repo.spring.io/libs-release" }
+    maven { url "http://repo.spring.io/snapshot" }
+    maven { url "http://repo.spring.io/milestone" }
+}
+
+/* Definition of project dependencies */
+
+dependencies {
+    implementation group:"org.springframework.boot", name:"spring-boot-starter-jersey"
+    implementation group:"org.springframework.boot", name:"spring-boot-starter-tomcat"
+    implementation group:"org.springframework.boot", name:"spring-boot-starter-log4j2"
+    
+    // Spring boot starter that help managing and monitoring the application
+    implementation group:"org.springframework.boot", name:"spring-boot-starter-actuator"
+    
+    implementation group:"org.springframework.boot", name:"spring-boot-devtools"
+    
+    // additional library for directing JUL logging to log4j2
+    implementation group:"org.apache.logging.log4j", name:"log4j-jul"
+    
+    implementation group:"javax.servlet", name:"javax.servlet-api"
+    implementation group:"org.glassfish.jersey.containers", name:"jersey-container-servlet"
+    implementation group:"org.glassfish.jersey.inject", name:"jersey-hk2"
+    implementation group:"org.glassfish.jersey.ext", name:"jersey-spring4"
+
+    implementation group:"org.springframework", name:"spring-context"
+    implementation group:"org.springframework", name:"spring-web"
+    implementation group:"org.springframework", name:"spring-aspects"
+    
+    /* Security libraries */
+    implementation group:"org.springframework.security", name:"spring-security-core"
+    implementation group:"org.springframework.security", name:"spring-security-web"
+    implementation group:"org.springframework.security", name:"spring-security-config"
+    implementation group:"org.springframework.security", name:"spring-security-jwt", version:"1.0.10.RELEASE"
+    implementation group:"org.springframework.security.oauth", name:"spring-security-oauth2", version:"2.3.6.RELEASE"
+    implementation group:"org.jasypt", name:"jasypt", version:"1.9.3"
+    
+    // Thymeleaf template engine
+    implementation group:"org.thymeleaf", name:"thymeleaf-spring5"
+    
+    /* libraries for managing and accessing the persistent storage */
+    implementation group:"org.springframework.data", name:"spring-data-jpa"
+    implementation group:"org.hibernate", name:"hibernate-core"
+    implementation group:"org.apache.tomcat", name:"tomcat-jdbc", version:"9.0.1"
+    implementation group: "com.h2database", name:"h2"
+
+    implementation group:"org.apache.commons", name:"commons-text", version:"1.6"
+    implementation group:"commons-validator", name:"commons-validator", version:"1.6"
+
+    /* libraries for testing only */
+    testImplementation group:"org.springframework.boot", name:"spring-boot-starter-test"
+    // TestRestTemplate does not work well with the negative answer it gets. The server correctly returns an access denied
+    // response, but TestRestTemplate generates the following exception:
+    // org.springframework.web.client.ResourceAccessException: I/O error on POST request for
+    // "http://localhost:58725/oauth/authorize": cannot retry due to server authentication, in streaming mode; nested exception
+    // is java.net.HttpRetryException: cannot retry due to server authentication, in streaming mode
+    // The reason is the HTTP client Spring uses for that. Including the apache HTTP client here tells Spring to use that one
+    // instead of its default which fixes the above problem.
+    testImplementation group:"org.apache.httpcomponents", name:"httpclient"
+}
+
+// exclude transitive dependencies that interfere with manually defined dependencies
+configurations.all {
+   exclude group:"org.springframework.boot", module: "spring-boot-starter-logging"
+   exclude group:"ch.qos.logback", module:"logback-core"
+   exclude group:"commons-logging", module:"commons-logging"
+}
