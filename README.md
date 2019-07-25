@@ -14,3 +14,11 @@ https://stackoverflow.com/questions/57004314/how-to-solve-illegalstateexception-
 * execute the service using the command `java -jar .\build\libs\investigate-springsec-jar-only-problem.jar` (assuming you are in the project base folder)
 * try to obtain authentication tokens from `https://localhost:8444/oauth/token`
 * => error
+
+# Getting rid of the problem
+There are two possibilities to get rid of the error thrown by obtaining a token.
+* Removing the autowired `strongEncryptor` in the class `EncryptionConverter`
+* Removing the injected `PersistenceContext` in the class PasswordResetManagerImpl
+Those two things are somehow in conflict, but only when running the project using the jar-file.
+
+# But how to solve problem?
