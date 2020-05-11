@@ -52,6 +52,18 @@ public class ServiceApplication extends SpringBootServletInitializer {
         ds.setMinIdle(env.getRequiredProperty("db.pool.minIdle", Integer.class));
         ds.setMaxIdle(env.getRequiredProperty("db.pool.maxIdle", Integer.class));
         ds.setJmxEnabled(env.getRequiredProperty("db.pool.jmxEnabled", Boolean.class));
+
+        // Check connection when obtained from pool to determine if it is still alive
+        ds.setTestOnBorrow(env.getRequiredProperty("db.pool.testOnBorrow", Boolean.class));
+        ds.setValidationQuery(env.getRequiredProperty("db.pool.validationQuery", String.class));
+        ds.setValidationQueryTimeout(env.getRequiredProperty("db.pool.validationQueryTimeout", Integer.class));
+
+        // If a program part that has borrowed a connection from the pool does not return it within a reasonable time it is
+        // considered abandoned, meaning, it is assumed that the respective program part did forget to return it, got stuck or
+        // similar. Abandoned connections will be closed eventually by the pool.
+        ds.setRemoveAbandoned(env.getRequiredProperty("db.pool.removeAbandoned", Boolean.class));
+        ds.setRemoveAbandonedTimeout(env.getRequiredProperty("db.pool.removeAbandonedTimeout", Integer.class));
+
         return ds;
     }
 
